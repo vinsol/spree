@@ -1,5 +1,5 @@
 FactoryGirl.define do
   factory :taxonomy, class: Spree::Taxonomy do
-    name 'Brand'
+    sequence(:name) { |n| "Brand #{ n }" }
   end
 end
