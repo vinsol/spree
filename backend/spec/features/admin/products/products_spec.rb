@@ -6,7 +6,7 @@ describe "Products", type: :feature do
     stub_authorization!
 
     def build_option_type_with_values(name, values)
-      ot = FactoryGirl.create(:option_type, name: name)
+      ot = FactoryGirl.create(:option_type)
       values.each do |val|
         ot.option_values.create(name: val.downcase, presentation: val)
       end
@@ -112,7 +112,7 @@ describe "Products", type: :feature do
 
     context "creating a new product from a prototype", js: true do
       def build_option_type_with_values(name, values)
-        ot = FactoryGirl.create(:option_type, name: name)
+        ot = FactoryGirl.create(:option_type)
         values.each do |val|
           ot.option_values.create(name: val.downcase, presentation: val)
         end
@@ -140,7 +140,7 @@ describe "Products", type: :feature do
 
       before(:each) do
         @option_type_prototype = prototype
-        @property_prototype = create(:prototype, name: "Random")
+        @property_prototype = create(:prototype)
         @shipping_category = create(:shipping_category)
         visit spree.admin_products_path
         click_link "admin_new_product"
@@ -166,7 +166,7 @@ describe "Products", type: :feature do
       end
 
       it "should not display variants when prototype does not contain option types" do
-        select "Random", from: "Prototype"
+        select @property_prototype.name, from: "Prototype"
 
         fill_in "product_name", with: "Baseball Cap"
 
@@ -215,7 +215,7 @@ describe "Products", type: :feature do
         fill_in "product_sku", with: "B100"
         fill_in "product_price", with: "100"
         click_button "Create"
-        expect(page).to have_content("Shipping category can't be blank")
+        expect(page).to have_content("Shipping Category can't be blank")
       end
 
       context "using a locale with a different decimal format " do
@@ -302,12 +302,12 @@ describe "Products", type: :feature do
 
       let(:prototype) do
         size = build_option_type_with_values("size", %w(Small Medium Large))
-        FactoryGirl.create(:prototype, name: "Size", option_types: [ size ])
+        @prototype = FactoryGirl.create(:prototype, name: "Size", option_types: [ size ])
       end
 
       before(:each) do
         @option_type_prototype = prototype
-        @property_prototype = create(:prototype, name: "Random")
+        @property_prototype = create(:prototype)
       end
 
       it 'should parse correctly available_on' do
@@ -329,7 +329,7 @@ describe "Products", type: :feature do
         end
 
         within(:css, "tr.product_property:first-child") do
-          expect(first('input[type=text]').value).to eq('baseball_cap_color')
+          expect(first('input[type=text]').value).to match(@prototype.property.name)
         end
       end
     end

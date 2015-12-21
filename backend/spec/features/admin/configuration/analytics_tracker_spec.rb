@@ -5,7 +5,7 @@ describe "Analytics Tracker", type: :feature do
 
   context "index" do
     before(:each) do
-      2.times { create(:tracker) }
+      @tracker1, @tracker2 = create(:tracker), create(:tracker)
       visit spree.admin_trackers_path
     end
 
@@ -15,12 +15,12 @@ describe "Analytics Tracker", type: :feature do
 
     it "should have the right tabular values displayed" do
       within_row(1) do
-        expect(column_text(1)).to eq("A100")
+        expect(column_text(1)).to eq(@tracker1.analytics_id)
         expect(column_text(2)).to eq("Yes")
       end
 
       within_row(2) do
-        expect(column_text(1)).to eq("A100")
+        expect(column_text(1)).to eq(@tracker2.analytics_id)
         expect(column_text(2)).to eq("Yes")
       end
     end

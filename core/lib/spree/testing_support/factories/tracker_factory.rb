@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :tracker, class: Spree::Tracker do
-    analytics_id 'A100'
+    sequence(:analytics_id)  { |n| "A #{ n }" }
     active true
   end
 end
