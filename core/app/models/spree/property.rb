@@ -1,6 +1,6 @@
 module Spree
   class Property < Spree::Base
-    has_many :property_prototypes, class_name: 'Spree::PropertyPrototype'
+    has_many :property_prototypes, class_name: 'Spree::PropertyPrototype', dependent: :destroy
     has_many :prototypes, through: :property_prototypes, class_name: 'Spree::Prototype'
 
     has_many :product_properties, dependent: :delete_all, inverse_of: :property

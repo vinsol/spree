@@ -9,7 +9,7 @@ module Spree
 
     has_many :products, through: :product_option_types
 
-    has_many :option_type_prototypes, class_name: 'Spree::OptionTypePrototype'
+    has_many :option_type_prototypes, class_name: 'Spree::OptionTypePrototype', dependent: :destroy
     has_many :prototypes, through: :option_type_prototypes, class_name: 'Spree::Prototype'
 
     with_options presence: true do
