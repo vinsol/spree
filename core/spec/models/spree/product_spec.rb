@@ -445,7 +445,7 @@ describe Spree::Product, :type => :model do
 
     it "will delete all classifications" do
       reflection = Spree::Product.reflect_on_association(:classifications)
-      expect(reflection.options[:dependent]).to eq(:delete_all)
+      expect(reflection.options[:dependent]).to eq(:destroy)
     end
   end
 

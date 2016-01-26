@@ -716,7 +716,7 @@ describe Spree::Shipment, :type => :model do
   context "#destroy" do
     it "destroys linked shipping_rates" do
       reflection = Spree::Shipment.reflect_on_association(:shipping_rates)
-      expect(reflection.options[:dependent]).to be(:delete_all)
+      expect(reflection.options[:dependent]).to be(:destroy)
     end
   end
 

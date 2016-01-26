@@ -10,7 +10,7 @@ module Spree
     acts_as_nested_set dependent: :destroy
 
     belongs_to :taxonomy, class_name: 'Spree::Taxonomy', inverse_of: :taxons
-    has_many :classifications, -> { order(:position) }, dependent: :delete_all, inverse_of: :taxon
+    has_many :classifications, -> { order(:position) }, dependent: :destroy, inverse_of: :taxon
     has_many :products, through: :classifications
 
     has_many :prototype_taxons, class_name: 'Spree::PrototypeTaxon', dependent: :destroy

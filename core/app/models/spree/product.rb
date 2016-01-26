@@ -30,7 +30,7 @@ module Spree
     has_many :product_properties, dependent: :destroy, inverse_of: :product
     has_many :properties, through: :product_properties
 
-    has_many :classifications, dependent: :delete_all, inverse_of: :product
+    has_many :classifications, dependent: :destroy, inverse_of: :product
     has_many :taxons, through: :classifications, before_remove: :remove_taxon
 
     has_many :product_promotion_rules, class_name: 'Spree::ProductPromotionRule', dependent: :destroy

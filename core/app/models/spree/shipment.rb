@@ -13,7 +13,7 @@ module Spree
     end
     belongs_to :stock_location, class_name: 'Spree::StockLocation'
 
-    with_options dependent: :delete_all do
+    with_options dependent: :destroy do
       has_many :adjustments, as: :adjustable
       has_many :inventory_units, inverse_of: :shipment
       has_many :shipping_rates, -> { order(:cost) }
