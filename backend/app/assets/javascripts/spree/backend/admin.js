@@ -200,6 +200,9 @@ handle_date_picker_fields = function(){
   });
 
   // Correctly display range dates
+  $('.date-range-filter .datepicker-from').datepicker('option', 'maxDate', 0)
+  $('.date-range-filter .datepicker-to').datepicker('option', 'maxDate', 0)
+
   $('.date-range-filter .datepicker-from').datepicker('option', 'onSelect', function(selectedDate) {
     $(".date-range-filter .datepicker-to" ).datepicker( "option", "minDate", selectedDate );
   });
