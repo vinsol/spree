@@ -69,7 +69,6 @@ module Spree
 
     has_many :variant_images, -> { order(:position) }, source: :images, through: :variants_including_master
 
-    after_create :set_master_variant_defaults
     after_create :add_associations_from_prototype
     after_create :build_variants_from_option_values_hash, if: :option_values_hash
 
@@ -245,10 +244,11 @@ module Spree
     end
 
     def any_variants_not_track_inventory?
+      return true unless Spree::Config.track_inventory_levels
       if variants_including_master.loaded?
-        variants_including_master.any? { |v| !v.should_track_inventory? }
+        variants_including_master.any? { |v| !v.track_inventory? }
       else
-        !Spree::Config.track_inventory_levels || variants_including_master.where(track_inventory: false).exists?
+        variants_including_master.where(track_inventory: false).exists?
       end
     end
 
@@ -327,11 +327,6 @@ module Spree
           self.errors.add(att, error)
         end
       end
-    end
-
-    # ensures the master variant is flagged as such
-    def set_master_variant_defaults
-      master.is_master = true
     end
 
     # Try building a slug based on the following fields in increasing order of specificity.
