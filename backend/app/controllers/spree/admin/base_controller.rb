@@ -38,8 +38,8 @@ module Spree
         Spree.t(event_sym, resource: resource_desc)
       end
 
-      def render_js_for_destroy
-        render partial: '/spree/admin/shared/destroy'
+      def render_js_for_destroy(resource)
+        render partial: '/spree/admin/shared/destroy', status: resource.deleted? ? 200 : 422
       end
 
       # Index request for JSON needs to pass a CSRF token in order to prevent JSON Hijacking
