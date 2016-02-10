@@ -34,12 +34,9 @@ module Spree
         ON spree_order_promotions.promotion_id = #{table_name}.id
       SQL
     }
+    scope :advertised, ->{ where(advertise: true) }
 
     self.whitelisted_ransackable_attributes = ['path', 'promotion_category_id', 'code']
-
-    def self.advertised
-      where(advertise: true)
-    end
 
     def self.with_coupon_code(coupon_code)
       where("lower(#{table_name}.code) = ?", coupon_code.strip.downcase).first
