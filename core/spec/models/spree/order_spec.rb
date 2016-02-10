@@ -22,7 +22,7 @@ describe Spree::Order, :type => :model do
       let!(:order3) { create(:order, created_at: Time.current, completed_at: nil) }
       let!(:order4) { create(:order, created_at: Time.current - 2.days, completed_at: nil) }
 
-      it 'is expected to show complete orders order by completed_at DESC first, and then incomplete orders order by created_at DESC' do
+      it 'is expected to show complete orders order by completed_at DESC, followed by incomplete orders order by created_at DESC' do
         expect(Spree::Order.reverse_chronological).to eq([order2, order1, order3, order4])
       end
     end
