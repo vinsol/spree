@@ -10,9 +10,14 @@ describe Spree::Country, type: :model do
       expect(described_class.default.id).to eql canada.id
     end
 
-    it 'will return the US if config is not set' do
+    it 'will return america if config is not set' do
       america.touch
       expect(described_class.default.id).to eql america.id
+    end
+
+    it 'will return the first record if config is not set and america is not created' do
+      canada.touch
+      expect(described_class.default.id).to eql canada.id
     end
   end
 end
