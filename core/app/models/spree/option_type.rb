@@ -23,8 +23,10 @@ module Spree
 
     after_touch :touch_all_products
 
-    def touch_all_products
-      products.update_all(updated_at: Time.current)
-    end
+    private
+
+      def touch_all_products
+        products.update_all(updated_at: Time.current)
+      end
   end
 end
