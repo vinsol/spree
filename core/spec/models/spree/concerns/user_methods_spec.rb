@@ -8,6 +8,9 @@ describe Spree::UserMethods do
     it 'should have many promotion_rule_users' do
       is_expected.to have_many(:promotion_rule_users).with_foreign_key(:user_id).class_name('Spree::PromotionRuleUser')
     end
+
+    it { is_expected.to have_many(:promotion_rule_users).with_foreign_key(:user_id).class_name('Spree::PromotionRuleUser').dependent(:destroy) }
+    it { is_expected.to have_many(:role_users).class_name('Spree::RoleUser').with_foreign_key(:user_id).dependent(:destroy) }
   end
 
   describe '#has_spree_role?' do
