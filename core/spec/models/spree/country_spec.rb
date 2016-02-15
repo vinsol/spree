@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe Spree::Country, type: :model do
+  describe 'Associations' do
+    it { is_expected.to have_many(:addresses).dependent(:restrict_with_error) }
+  end
+
   describe '.default' do
     let(:america) { create :country }
     let(:canada)  { create :country, name: 'Canada' }
