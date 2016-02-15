@@ -13,7 +13,7 @@ module Spree
 
     has_many :shipping_method_categories, dependent: :destroy
     has_many :shipping_categories, through: :shipping_method_categories
-    has_many :shipping_rates, inverse_of: :shipping_method
+    has_many :shipping_rates, inverse_of: :shipping_method, dependent: :destroy
     has_many :shipments, through: :shipping_rates
 
     has_many :shipping_method_zones, class_name: 'Spree::ShippingMethodZone',

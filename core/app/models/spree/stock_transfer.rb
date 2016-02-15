@@ -5,7 +5,7 @@ module Spree
     extend FriendlyId
     friendly_id :number, slug_column: :number, use: :slugged
 
-    has_many :stock_movements, as: :originator
+    has_many :stock_movements, as: :originator, dependent: :restrict_with_error
 
     belongs_to :source_location, class_name: 'StockLocation'
     belongs_to :destination_location, class_name: 'StockLocation'
