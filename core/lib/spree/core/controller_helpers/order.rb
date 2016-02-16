@@ -83,9 +83,9 @@ module Spree
           # Find any incomplete orders for the guest_token
           incomplete_orders = Spree::Order.incomplete.includes(line_items: [variant: [:images, :option_values, :product]])
           order = if with_adjustments
-                    incomplete_orders.includes(:adjustments).lock(options[:lock]).find_by(current_order_params)
+                    incomplete_orders.includes(:adjustments).lock(options[:lock]).find_by(current_order_params.except(:user_id))
                   else
-                    incomplete_orders.lock(options[:lock]).find_by(current_order_params)
+                    incomplete_orders.lock(options[:lock]).find_by(current_order_params.except(:user_id))
                   end
 
           # Find any incomplete orders for the current user
