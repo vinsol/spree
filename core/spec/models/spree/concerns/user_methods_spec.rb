@@ -3,6 +3,11 @@ require 'spec_helper'
 describe Spree::UserMethods do
   let(:test_user) { create :user }
 
+  describe 'Associations' do
+    subject { test_user }
+    it { is_expected.to have_many(:promotion_rule_users).with_foreign_key(:user_id).class_name('Spree::PromotionRuleUser') }
+  end
+
   describe '#has_spree_role?' do
     subject { test_user.has_spree_role? name }
 
