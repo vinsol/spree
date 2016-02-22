@@ -118,7 +118,8 @@ class Spree::Admin::ResourceController < Spree::Admin::BaseController
   end
 
   def resource_not_found
-    flash[:error] = flash_message_for(model_class.new, :not_found)
+    klass = (parent_data.present? && parent.nil?) ? parent_data[:model_class] : model_class
+    flash[:error] = flash_message_for(klass.new, :not_found)
     redirect_to collection_url
   end
 
@@ -189,6 +190,7 @@ class Spree::Admin::ResourceController < Spree::Admin::BaseController
   end
 
   def collection
+    raise ActiveRecord::RecordNotFound if parent_data.present? && parent.nil?
     return parent.send(controller_name) if parent_data.present?
     if model_class.respond_to?(:accessible_by) &&
         !current_ability.has_block?(params[:action], model_class)
@@ -235,8 +237,10 @@ class Spree::Admin::ResourceController < Spree::Admin::BaseController
   end
 
   def collection_url(options = {})
-    if parent_data.present?
+    if parent_data.present? && parent
       spree.polymorphic_url([:admin, parent, model_class], options)
+    elsif parent_data.present?
+      spree.polymorphic_url([:admin, parent_data[:model_class]], options)
     else
       spree.polymorphic_url([:admin, model_class], options)
     end
