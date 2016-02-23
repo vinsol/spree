@@ -13,7 +13,7 @@
           <%= f.text_field :name, :class => 'form-control' %>
         </div>
         <div data-hook="rate" class="form-group">
-          <%= f.label :amount, Spree.t(:rate) %>
+          <%= f.label :amount, required_label_markup(Spree.t(:rate)) %>
           <%= f.text_field :amount, :class => 'form-control' %>
           <p class="help-block">
             <%= Spree.t(:tax_rate_amount_explanation) %>
@@ -33,7 +33,7 @@
           <%= f.collection_select(:zone_id, @available_zones, :id, :name, {}, {:class => 'select2'}) %>
         </div>
         <div data-hook="category" class="form-group">
-          <%= f.label :tax_category_id, Spree.t(:tax_category) %>
+          <%= f.label :tax_category_id, required_label_markup(Spree.t(:tax_category)) %>
           <%= f.collection_select(:tax_category_id, @available_categories,:id, :name, {}, {:class => 'select2'}) %>
         </div>
         <div data-hook="show_rate" class="form-group">
