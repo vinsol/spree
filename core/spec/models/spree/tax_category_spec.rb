@@ -1,6 +1,14 @@
 require 'spec_helper'
 
 describe Spree::TaxCategory, :type => :model do
+  describe 'validations' do
+    it { is_expected.to validate_presence_of(:name) }
+    it { is_expected.to validate_uniqueness_of(:name).scoped_to(:deleted_at) }
+    it { is_expected.to validate_length_of(:name).is_at_most(255) }
+    it { is_expected.to validate_length_of(:description).is_at_most(255) }
+    it { is_expected.to validate_length_of(:tax_code).is_at_most(255) }
+  end
+
   context 'default tax category' do
     let(:tax_category) { create(:tax_category) }
     let(:new_tax_category) { create(:tax_category) }
