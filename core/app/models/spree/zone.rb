@@ -178,10 +178,7 @@ module Spree
     def set_zone_members(ids, type)
       zone_members.destroy_all
       ids.reject(&:blank?).map do |id|
-        member = ZoneMember.new
-        member.zoneable_type = type
-        member.zoneable_id = id
-        members << member
+        zone_members.build(zoneable_id: id, zoneable_type: type)
       end
     end
   end
