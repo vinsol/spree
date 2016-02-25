@@ -1,6 +1,6 @@
 <% promotions = @product.possible_promotions %>
 
-<% if promotions.any? %>
+<% if promotions.present? %>
   <div id="promotions">
     <h3><%= Spree.t(:promotions) %></h3>
     <% promotions.each do |promotion| %>
