@@ -14,6 +14,7 @@ module Spree
     before_destroy :ensure_not_default
 
     validates :name, :iso_name, presence: true, uniqueness: { case_sensitive: false, allow_blank: true }
+    validate :can_have_states?, if: -> { states.present? }
 
     def self.default
       country_id = Spree::Config[:default_country_id]
@@ -34,6 +35,12 @@ module Spree
       if id.eql?(Spree::Config[:default_country_id])
         errors.add(:base, Spree.t(:default_country_cannot_be_deleted))
         false
+      end
+    end
+
+    def can_have_states?
+      unless states_required?
+        errors.add(:states_required, Spree.t(:states_required_invalid))
       end
     end
   end
