@@ -141,6 +141,10 @@ module Spree
         resource_class.model_name.human(count: I18N_PLURAL_MANY_COUNT)
       end
 
+      def back_to_list_button(resource, path)
+        link_to_with_icon 'arrow-left', Spree.t(:back_to_resource_list, resource: resource), path, class: 'btn btn-default'
+      end
+
       private
         def attribute_name_for(field_name)
           field_name.gsub(' ', '_').downcase
