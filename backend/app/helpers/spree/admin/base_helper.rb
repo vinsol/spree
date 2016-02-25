@@ -141,10 +141,19 @@ module Spree
         resource_class.model_name.human(count: I18N_PLURAL_MANY_COUNT)
       end
 
+      def required_label_markup(title)
+        raw(title + required_markup)
+      end
+
       private
-        def attribute_name_for(field_name)
-          field_name.gsub(' ', '_').downcase
-        end
+
+      def attribute_name_for(field_name)
+        field_name.tr(' ', '_').downcase
+      end
+
+      def required_markup
+        content_tag(:span, ' *', class: 'required')
+      end
     end
   end
 end

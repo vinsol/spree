@@ -3,7 +3,7 @@
 <div class="row" id="general_fields" >
   <div class="col-md-3">
     <%= f.field_container :name, class: ['form-group'] do %>
-      <%= f.label :name %>
+      <%= f.label :name, required_label_markup(Spree.t(:name)) %>
       <%= f.text_field :name, :class => 'form-control' %>
     <% end %>
 

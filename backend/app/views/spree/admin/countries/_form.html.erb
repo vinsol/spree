@@ -1,11 +1,11 @@
 <div data-hook="admin_country_form_fields">
   <div data-hook="name" class="form-group">
-    <%= f.label :name, Spree.t(:name) %>
+    <%= f.label :name, required_label_markup(Spree.t(:name)) %>
     <%= f.text_field :name, :class => 'form-control' %>
   </div>
 
   <div data-hook="iso_name" class="form-group">
-    <%= f.label :iso_name, Spree.t(:iso_name) %>
+    <%= f.label :iso_name, required_label_markup(Spree.t(:iso_name)) %>
     <%= f.text_field :iso_name, :class => 'form-control' %>
   </div>
 
