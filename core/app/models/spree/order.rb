@@ -273,7 +273,7 @@ module Spree
 
       # immediately persist the changes we just made, but don't use save
       # since we might have an invalid address associated
-      update_columns(changes)
+      update_columns(changes) if persisted?
     end
 
     def quantity_of(variant, options = {})
