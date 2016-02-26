@@ -27,7 +27,8 @@ module Spree
 
     before_save :normalize_blank_values
 
-    scope :coupons, -> { where("#{table_name}.code IS NOT NULL") }
+    scope :coupons, -> { where(arel_table[:code].not_eq(nil)) }
+
     scope :applied, lambda {
       joins(<<-SQL).uniq
         INNER JOIN spree_order_promotions
@@ -39,7 +40,7 @@ module Spree
     self.whitelisted_ransackable_attributes = ['path', 'promotion_category_id', 'code']
 
     def self.with_coupon_code(coupon_code)
-      where("lower(#{table_name}.code) = ?", coupon_code.strip.downcase).first
+      where(arel_table[:code].lower.eq(coupon_code.strip.downcase)).first
     end
 
     def self.active
