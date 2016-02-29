@@ -8,7 +8,7 @@ module Spree
     has_one :root, -> { where parent_id: nil }, class_name: "Spree::Taxon", dependent: :destroy
 
     after_create :set_root
-    after_save :set_root_taxon_name
+    after_update :set_root_taxon_name, if: :name_changed?
 
     default_scope { order("#{self.table_name}.position, #{self.table_name}.created_at") }
 
