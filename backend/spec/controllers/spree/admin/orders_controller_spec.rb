@@ -76,9 +76,21 @@ describe Spree::Admin::OrdersController, type: :controller do
 
     # Test for #3346
     context "#new" do
-      it "a new order has the current user assigned as a creator" do
+      before do
+        Spree::Store.create!(
+          name: "Jaspreet's store", code: 'jaspreet21anand',
+          url: 'vinsol.com', mail_from_address: 'jaspreet21anand@gmail.com',
+          default: true
+        )
         spree_get :new
+      end
+
+      it "a new order has the current user assigned as a creator" do
         expect(assigns[:order].created_by).to eq(controller.try_spree_current_user)
+      end
+
+      it "a new order has default store assigned when no param for store is present" do
+        expect(assigns[:order].store).to eq(Spree::Store.default)
       end
     end
 
