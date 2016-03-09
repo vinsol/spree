@@ -57,6 +57,16 @@ describe Spree::Promotion, :type => :model do
     end
   end
 
+  # Regression test for #4081
+  describe ".with_coupon_code" do
+    context "and code stored in uppercase" do
+      let!(:promotion) { create(:promotion, :code => "MY-COUPON-123") }
+      it "finds the code with lowercase" do
+        expect(Spree::Promotion.with_coupon_code("my-coupon-123")).to eql promotion
+      end
+    end
+  end
+
   describe "#destroy" do
     let(:promotion) { Spree::Promotion.create(:name => "delete me") }
 
@@ -512,16 +522,6 @@ describe Spree::Promotion, :type => :model do
       promotion = Spree::Promotion.create(:name => "A promotion", :code => "", :path => "")
       expect(promotion.code).to be_nil
       expect(promotion.path).to be_nil
-    end
-  end
-
-  # Regression test for #4081
-  describe "#with_coupon_code" do
-    context "and code stored in uppercase" do
-      let!(:promotion) { create(:promotion, :code => "MY-COUPON-123") }
-      it "finds the code with lowercase" do
-        expect(Spree::Promotion.with_coupon_code("my-coupon-123")).to eql promotion
-      end
     end
   end
 
