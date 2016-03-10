@@ -12,22 +12,22 @@ module Spree
 
     DEFAULT_CREATED_BY_EMAIL = 'spree@example.com'.freeze
 
-    belongs_to :user, class_name: Spree.user_class.to_s, foreign_key: 'user_id'
-    belongs_to :category, class_name: "Spree::StoreCreditCategory"
-    belongs_to :created_by, class_name: Spree.user_class.to_s, foreign_key: 'created_by_id'
-    belongs_to :credit_type, class_name: 'Spree::StoreCreditType', foreign_key: 'type_id'
-    has_many :store_credit_events
+    belongs_to :user, class_name: Spree.user_class.to_s, foreign_key: :user_id
+    belongs_to :category, class_name: 'Spree::StoreCreditCategory'
+    belongs_to :created_by, class_name: Spree.user_class.to_s, foreign_key: :created_by_id
+    belongs_to :credit_type, class_name: 'Spree::StoreCreditType', foreign_key: :type_id
+    has_many :store_credit_events, dependent: :restrict_with_error
 
-    validates_presence_of :user, :category, :credit_type, :created_by, :currency
-    validates_numericality_of :amount, greater_than: 0
-    validates_numericality_of :amount_used, greater_than_or_equal_to: 0
+    validates :user, :category, :credit_type, :created_by, :currency, presence: true
+    validates :amount, numericality: { greater_than: 0 }
+    validates :amount_used, numericality: { greater_than_or_equal_to: 0 }
     validate :amount_used_less_than_or_equal_to_amount
     validate :amount_authorized_less_than_or_equal_to_amount
 
     delegate :name, to: :category, prefix: true
     delegate :email, to: :created_by, prefix: true
 
-    scope :order_by_priority, -> { includes(:credit_type).order('spree_store_credit_types.priority ASC') }
+    scope :order_by_priority, -> { includes(:credit_type).order(spree_store_credit_types: { priority: :asc }) }
 
     before_validation :associate_credit_type
     after_save :store_event
@@ -199,7 +199,7 @@ module Spree
     end
 
     def credit_allocation_memo
-      "This is a credit from store credit ID #{id}"
+      Spree.t('store_credit.credit_allocation_memo', id: id)
     end
 
     def store_event
@@ -223,21 +223,21 @@ module Spree
       return true if amount_used.nil?
 
       if amount_used > amount
-        errors.add(:amount_used, Spree.t('admin.store_credits.errors.amount_used_cannot_be_greater'))
+        errors.add(:amount_used, Spree.t('store_credit.errors.amount_used_cannot_be_greater'))
         false
       end
     end
 
     def amount_authorized_less_than_or_equal_to_amount
       if (amount_used + amount_authorized) > amount
-        errors.add(:amount_authorized, Spree.t('admin.store_credits.errors.amount_authorized_exceeds_total_credit'))
+        errors.add(:amount_authorized, Spree.t('store_credit.errors.amount_authorized_exceeds_total_credit'))
         false
       end
     end
 
     def validate_no_amount_used
       if amount_used > 0
-        errors.add(:amount_used, 'is greater than zero. Can not delete store credit')
+        errors.add(:amount_used, Spree.t('store_credit.errors.amount_used_not_zero'))
         false
       end
     end

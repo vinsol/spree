@@ -1341,16 +1341,20 @@ en:
     store: Store
     store_credit: Store Credit
     store_credit:
-      credit: "Credit"
-      authorized: "Authorized"
-      captured: "Used"
-      allocated: "Added"
-      apply: Apply Store Credit
-      applicable_amount: "%{amount} in store credit will be applied to this order."
-      available_amount: "You have %{amount} in Store Credit available!"
-      remaining_amount: "You have %{amount} remaining in your account\'s Store Credit."
       additional_payment_needed: Select another payment method for the remaining %{amount}.
+      allocated: Added
+      applicable_amount: "%{amount} in store credit will be applied to this order."
+      apply: Apply Store Credit
+      available_amount: "You have %{amount} in Store Credit available!"
+      authorized: Authorized
+      captured: Used
+      credit: Credit
+      credit_allocation_memo: This is a credit from store credit ID %{id}.
+      remaining_amount: "You have %{amount} remaining in your account\'s Store Credit."
       errors:
+        amount_authorized_exceeds_total_credit: exceeds the available credit
+        amount_used_cannot_be_greater: cannot be greater than the credited amount
+        amount_used_not_zero: is greater than zero. Can not delete store credit
         cannot_change_used_store_credit: You cannot change a store credit that has already been used
         unable_to_create: Unable to create store credit
         unable_to_delete: Unable to delete store credit
