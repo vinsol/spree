@@ -13,14 +13,14 @@ module Spree
         it "returns an inventory unit for each quantity for the order's line items" do
           units = subject.units
           expect(units.count).to eq 3
-          expect(units.first.line_item).to eq line_item_1
-          expect(units.first.variant).to eq line_item_1.variant
+          expect(units.first.line_item_id).to eq line_item_1.id
+          expect(units.first.variant_id).to eq line_item_1.variant_id
 
-          expect(units[1].line_item).to eq line_item_2
-          expect(units[1].variant).to eq line_item_2.variant
+          expect(units[1].line_item_id).to eq line_item_2.id
+          expect(units[1].variant_id).to eq line_item_2.variant_id
 
-          expect(units[2].line_item).to eq line_item_2
-          expect(units[2].variant).to eq line_item_2.variant
+          expect(units[2].line_item_id).to eq line_item_2.id
+          expect(units[2].variant_id).to eq line_item_2.variant_id
         end
 
         it "builds the inventory units as pending" do
