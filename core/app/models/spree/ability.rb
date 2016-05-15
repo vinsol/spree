@@ -51,13 +51,14 @@ module Spree
         can :display, ProductProperty
         can :display, Property
         can :create, Spree.user_class
-        can [:read, :update, :destroy], Spree.user_class, id: user.id
+        can [:read, :update], Spree.user_class, id: user.id
         can :display, State
         can :display, Taxon
         can :display, Taxonomy
         can :display, Variant
         can :display, Zone
       end
+      cannot :destroy, Spree.user_class, id: user.id
 
       # Include any abilities registered by extensions, etc.
       Ability.abilities.each do |clazz|

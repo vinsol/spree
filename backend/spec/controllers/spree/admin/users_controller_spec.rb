@@ -66,6 +66,17 @@ describe Spree::Admin::UsersController, :type => :controller do
     end
   end
 
+  describe '#destroy' do
+    context 'deny users from destroying their own account' do
+      before do
+        allow(user).to receive_messages has_spree_role?: true
+        spree_delete :destroy, id: user.id
+      end
+
+      it { expect(response).to redirect_to(spree.forbidden_path) }
+    end
+  end
+
   describe "#create" do
     before do
       use_mock_user
