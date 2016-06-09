@@ -7,6 +7,8 @@ gem 'coffee-rails', '~> 4.1.1'
 gem 'sass-rails', '~> 5.0.0'
 gem 'sqlite3', platforms: [:ruby, :mingw, :mswin, :x64_mingw]
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
+gem 'paranoia', github: 'rubysherpas/paranoia', branch: 'core'
+gem 'acts-as-taggable-on', github: 'mbleigh/acts-as-taggable-on', branch: 'master'
 
 platforms :jruby do
   gem 'jruby-openssl'
@@ -28,7 +30,7 @@ group :test do
   gem 'rspec-activemodel-mocks', '~> 1.0.2'
   gem 'rspec-collection_matchers'
   gem 'rspec-its'
-  gem 'rspec-rails', '~> 3.4.2'
+  gem 'rspec-rails', '~> 3.5.0.beta4'
   gem 'simplecov'
   gem 'webmock', '~> 2.0.3'
   gem 'poltergeist', '~> 1.9.0'
