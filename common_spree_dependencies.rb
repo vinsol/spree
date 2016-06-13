@@ -8,7 +8,7 @@ gem 'sass-rails', '~> 5.0.0'
 gem 'sqlite3', platforms: [:ruby, :mingw, :mswin, :x64_mingw]
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 gem 'paranoia', github: 'rubysherpas/paranoia', branch: 'core'
-gem 'acts-as-taggable-on', github: 'mbleigh/acts-as-taggable-on', branch: 'master'
+gem 'acts-as-taggable-on', github: 'mbleigh/acts-as-taggable-on', branch: 'master', require: false
 
 platforms :jruby do
   gem 'jruby-openssl'
