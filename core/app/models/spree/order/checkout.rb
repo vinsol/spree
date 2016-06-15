@@ -226,7 +226,7 @@ module Spree
               # rails would slice parameters containg ruby objects, apparently
               existing_card_id = @updating_params[:order] ? @updating_params[:order].delete(:existing_card) : nil
 
-              attributes = @updating_params[:order] ? @updating_params[:order].permit(permitted_params).delete_if { |_k, v| v.nil? } : {}
+              attributes = @updating_params[:order] ? @updating_params[:order].permit(permitted_params).delete_if { |_k, v| v.nil? }.to_h : {}
 
               if existing_card_id.present?
                 credit_card = CreditCard.find existing_card_id

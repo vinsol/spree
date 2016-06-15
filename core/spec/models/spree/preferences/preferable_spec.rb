@@ -217,7 +217,7 @@ describe Spree::Preferences::Preferable, type: :model do
       end
 
       it "with ancestor of a hash" do
-        ancestor_of_hash = ActionController::Parameters.new({ key: :value })
+        ancestor_of_hash = HashWithIndifferentAccess.new({ key: :value })
         @a.set_preference(:is_hash, ancestor_of_hash)
         expect(@a.preferences[:is_hash]).to eql({"key" => :value})
       end
