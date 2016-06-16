@@ -19,7 +19,9 @@ module Spree
     it "warns about missing migrations" do
       expect(Dir).to receive(:entries).with(app_dir).and_return app_migrations
       expect(Dir).to receive(:entries).with(engine_dir).and_return engine_migrations
-      expect(subject.check).to eq true
+      silence_stream(STDOUT) {
+        expect(subject.check).to eq true
+      }
     end
 
     context "no missing migrations" do
