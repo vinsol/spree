@@ -92,6 +92,7 @@ module Spree
       # fixes https://github.com/spree/spree/issues/6888
       def per_page_dropdown_params(args = nil)
         args ||= params.clone
+        args = args.permit!
         args.delete(:page)
         args.delete(:per_page)
         args

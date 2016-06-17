@@ -28,7 +28,7 @@ module Spree
         if params[:ids]
           @products = Product.where(id: params[:ids].split(",").flatten)
         else
-          @products = Product.ransack(params[:q]).result
+          @products = Product.ransack(params[:q].to_unsafe_h).result
         end
 
         @products = @products.distinct.page(params[:page]).per(params[:per_page])
@@ -41,7 +41,7 @@ module Spree
           if params[:ids]
             Tag.where(id: params[:ids].split(",").flatten)
           else
-            Tag.ransack(params[:q]).result
+            Tag.ransack(params[:q].to_unsafe_h).result
           end
       end
     end

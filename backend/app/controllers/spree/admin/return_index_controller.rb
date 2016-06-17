@@ -19,7 +19,7 @@ module Spree
 
         @collection = resource.all
         # @search needs to be defined as this is passed to search_form_for
-        @search = @collection.ransack(params[:q])
+        @search = @collection.ransack(params[:q].to_unsafe_h)
         per_page = params[:per_page] || Spree::Config[:admin_products_per_page]
         @collection = @search.result.order(created_at: :desc).page(params[:page]).per(per_page)
       end

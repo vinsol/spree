@@ -9,6 +9,7 @@ gem 'sqlite3', platforms: [:ruby, :mingw, :mswin, :x64_mingw]
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw]
 gem 'paranoia', github: 'rubysherpas/paranoia', branch: 'core'
 gem 'acts-as-taggable-on', github: 'mbleigh/acts-as-taggable-on', branch: 'master', require: false
+gem 'ransack', github: 'activerecord-hackery/ransack', branch: 'master'
 
 platforms :jruby do
   gem 'jruby-openssl'

@@ -117,7 +117,7 @@ module Spree
         # @search needs to be defined as this is passed to search_form_for
         # Temporarily remove params[:q][:deleted_at_null] from params[:q] to ransack products.
         # This is to include all products and not just deleted products.
-        @search = @collection.ransack(params[:q].reject { |k, _v| k.to_s == 'deleted_at_null' })
+        @search = @collection.ransack(params[:q].reject { |k, _v| k.to_s == 'deleted_at_null' }.to_unsafe_h)
         @collection = @search.result.
               distinct_by_product_ids(params[:q][:s]).
               includes(product_includes).

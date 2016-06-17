@@ -21,7 +21,7 @@ module Spree
           params[:q][:s] ||= 'id desc'
 
           @collection = super
-          @search = @collection.ransack(params[:q])
+          @search = @collection.ransack(params[:q].to_unsafe_h)
           @collection = @search.result(distinct: true).
             includes(promotion_includes).
             page(params[:page]).
