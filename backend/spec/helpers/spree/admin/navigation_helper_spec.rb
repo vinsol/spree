@@ -5,6 +5,8 @@ describe Spree::Admin::NavigationHelper, type: :helper do
 
   describe "#tab" do
     before do
+      # `spree` route helper is not accessible in `type: :helper` hence extending it explicitly
+      helper.extend Spree::TestingSupport::UrlHelpers
       allow(helper).to receive(:cannot?).and_return false
     end
 
