@@ -44,7 +44,7 @@ module Spree
             :use_billing,
             bill_address_attributes: permitted_address_attributes,
             ship_address_attributes: permitted_address_attributes
-          ).to_h
+          )
         end
 
         def load_order
