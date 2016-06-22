@@ -7,7 +7,7 @@ module Spree
       respond_to :html
 
       def index
-        params[:q] ||= {}
+        params[:q] ||= ActionController::Parameters.new
         params[:q][:completed_at_not_null] ||= '1' if Spree::Config[:show_only_complete_orders_by_default]
         @show_only_completed = params[:q][:completed_at_not_null] == '1'
         params[:q][:s] ||= @show_only_completed ? 'completed_at desc' : 'created_at desc'
@@ -34,7 +34,7 @@ module Spree
           params[:q][:completed_at_lt] = params[:q].delete(:created_at_lt)
         end
 
-        @search = Order.preload(:user).accessible_by(current_ability, :index).ransack(params[:q])
+        @search = Order.preload(:user).accessible_by(current_ability, :index).ransack(params[:q].to_unsafe_h)
 
         # lazy loading other models here (via includes) may result in an invalid query
         # e.g. SELECT  DISTINCT DISTINCT "spree_orders".id, "spree_orders"."created_at" AS alias_0 FROM "spree_orders"
