@@ -159,12 +159,13 @@ module Spree
         icon_name ? content_tag(:i, '', class: icon_name) : ''
       end
 
+      #Override: Add disable_with option to prevent multiple request on consecutive clicks
       def button(text, icon_name = nil, button_type = 'submit', options={})
         if icon_name
           icon = content_tag(:span, '', class: "icon icon-#{icon_name}")
           text.insert(0, icon + ' ')
         end
-        button_tag(text.html_safe, options.merge(type: button_type, class: "btn btn-primary #{options[:class]}"))
+        button_tag(text.html_safe, options.merge(type: button_type, class: "btn btn-primary #{options[:class]}", data: { disable_with: Spree.t(:disable_data) }))
       end
 
       def button_link_to(text, url, html_options = {})
@@ -194,10 +195,12 @@ module Spree
       end
 
       def configurations_sidebar_menu_item(link_text, url, options = {})
-        is_active = url.ends_with?(controller.controller_name) ||
-                    url.ends_with?("#{controller.controller_name}/edit") ||
-                    url.ends_with?("#{controller.controller_name.singularize}/edit")
-        options.merge!(class: is_active ? 'active' : nil)
+        is_selected = url.ends_with?(controller.controller_name) ||
+                      url.ends_with?("#{controller.controller_name}/edit") ||
+                      url.ends_with?("#{controller.controller_name.singularize}/edit")
+
+        options[:class] = 'sidebar-menu-item'
+        options[:class] << ' selected' if is_selected
         content_tag(:li, options) do
           link_to(link_text, url)
         end

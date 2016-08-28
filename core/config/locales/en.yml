@@ -678,6 +678,7 @@ en:
     description: Description
     destination: Destination
     destroy: Destroy
+    disable_data: Please Wait
     discount_amount: Discount Amount
     discontinue_on: Discontinue On
     discontinued: Discontinued
