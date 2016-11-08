@@ -74,6 +74,6 @@ RSpec.configure do |config|
   end
 
   config.around do |example|
-    Timeout.timeout(30, &example)
+    Timeout.timeout(300, &example)
   end
 end

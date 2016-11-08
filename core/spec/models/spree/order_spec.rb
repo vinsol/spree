@@ -225,7 +225,7 @@ describe Spree::Order, type: :model do
     let(:line_items) { [line_item] }
 
     before do
-      allow(order).to receive_messages(line_items: [line_item])
+      allow(order).to receive_messages(line_items: line_items)
       allow(line_items).to receive_messages(includes: line_items)
     end
 
@@ -952,7 +952,7 @@ describe Spree::Order, type: :model do
 
     it "assigns the coordinator returned shipments to its shipments" do
       shipment = build(:shipment)
-      allow_any_instance_of(Spree::Stock::Coordinator).to receive(:shipments).and_return([{shipment: shipment}])
+      allow_any_instance_of(Spree::Stock::Coordinator).to receive(:shipments).and_return([{shipment: shipment, inventory_units: []}])
       subject.create_proposed_shipments
       expect(subject.shipments).to eq [shipment]
     end
