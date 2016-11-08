@@ -22,8 +22,10 @@ module Spree
         package = Package.new(stock_location)
 
         # Group by variant_id as grouping by variant fires cached query.
-        inventory_units.group_by(&:variant_id).each do |variant_id, variant_inventory_units|
-          variant = Spree::Variant.find(variant_id)
+        grouped_inventory_units = inventory_units.group_by(&:variant_id)
+        variants = Spree::Variant.where(id: grouped_inventory_units.keys).index_by(&:id)
+        grouped_inventory_units.each do |variant_id, variant_inventory_units|
+          variant = variants[variant_id]
           units = variant_inventory_units.clone
           if variant.should_track_inventory?
             next unless stock_location.stock_item(variant)
@@ -34,10 +36,11 @@ module Spree
             package.add_multiple on_hand_units, :on_hand if on_hand > 0
             package.add_multiple backordered_units, :backordered if backordered > 0
 
-            @allocated_inventory_units += (on_hand_units + backordered_units)
+            @allocated_inventory_units.push(*on_hand_units)
+            @allocated_inventory_units.push(*backordered_units)
           else
             package.add_multiple units
-            @allocated_inventory_units += units
+            @allocated_inventory_units.push(*units)
           end
         end
 

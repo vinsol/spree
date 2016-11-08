@@ -20,6 +20,7 @@ module Spree
       has_many :state_changes, as: :stateful
     end
     has_many :shipping_methods, through: :shipping_rates
+    has_many :line_items, -> { distinct }, through: :inventory_units
     has_one :selected_shipping_rate, -> { where(selected: true).order(:cost) }, class_name: Spree::ShippingRate
 
 
@@ -159,16 +160,12 @@ module Spree
       manifest.map { |m| (m.line_item.price + (m.line_item.adjustment_total / m.line_item.quantity)) * m.quantity }.sum
     end
 
-    def line_items
-      inventory_units.includes(:line_item).map(&:line_item).uniq
-    end
-
     ManifestItem = Struct.new(:line_item, :variant, :quantity, :states)
 
     def manifest
       # Grouping by the ID means that we don't have to call out to the association accessor
       # This makes the grouping by faster because it results in less SQL cache hits.
-      inventory_units.group_by(&:variant_id).map do |variant_id, units|
+      inventory_units.includes(:variant, :line_item).group_by(&:variant_id).map do |variant_id, units|
         units.group_by(&:line_item_id).map do |line_item_id, units|
 
           states = {}
@@ -239,6 +236,20 @@ module Spree
       shipping_rates.update_all(selected: false)
       shipping_rates.update(id, selected: true)
       self.save!
+    end
+
+    def process_inventory_unit_list(inventory_list = [])
+      conn = ActiveRecord::Base.connection
+      _time = Time.now.utc.to_s(:db)
+      insert_clause  = %Q{ INSERT INTO #{Spree::InventoryUnit.quoted_table_name} (#{conn.quote_column_name("state")}, #{conn.quote_column_name("variant_id")}, #{conn.quote_column_name("order_id")}, #{conn.quote_column_name("shipment_id")}, #{conn.quote_column_name("created_at")}, #{conn.quote_column_name("updated_at")}, #{conn.quote_column_name("line_item_id")}) VALUES }
+      inventory_list.group_by(&:state).each do |state, inventory_list_items|
+        inventory_list_items.group_by(&:variant_id).each do |variant_id, items|
+          values = items.map do |item|
+            %Q{ ('#{ state }', #{ variant_id }, #{ self.order_id }, #{ self.id }, '#{ _time }', '#{ _time }', #{ item.line_item_id }) }
+          end.join(", ")
+          conn.execute(insert_clause + values)
+        end
+      end
     end
 
     def set_up_inventory(state, variant, order, line_item)

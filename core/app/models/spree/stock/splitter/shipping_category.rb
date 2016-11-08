@@ -28,8 +28,12 @@ module Spree
         end
 
         def shipping_category_for(item)
-          @item_shipping_category ||= {}
-          @item_shipping_category[item.inventory_unit.variant_id] ||= item.variant.shipping_category_id
+          @item_shipping_category ||=
+            begin
+              order = item.inventory_unit.order
+              order.variants.includes(:product).inject({}) { |acc, variant| acc[variant.id] = variant.shipping_category_id; acc }
+            end
+          @item_shipping_category[item.inventory_unit.variant_id]
         end
       end
     end
