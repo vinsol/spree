@@ -242,7 +242,7 @@ module Spree
 
     def process_inventory_unit_list(inventory_list = [])
       conn = ActiveRecord::Base.connection
-      _time = Time.now.utc.to_s(:db)
+      _time = Time.zone.now.to_s(:db)
       insert_clause  = %Q{ INSERT INTO #{Spree::InventoryUnit.quoted_table_name} (#{conn.quote_column_name("state")}, #{conn.quote_column_name("variant_id")}, #{conn.quote_column_name("order_id")}, #{conn.quote_column_name("shipment_id")}, #{conn.quote_column_name("created_at")}, #{conn.quote_column_name("updated_at")}, #{conn.quote_column_name("line_item_id")}) VALUES }
       inventory_list.group_by(&:state).each do |state, inventory_list_items|
         inventory_list_items.group_by(&:variant_id).each do |variant_id, items|
