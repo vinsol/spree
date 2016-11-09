@@ -42,8 +42,8 @@ module Spree
         expect(new_shipment).to be_ready
         new_inventory_units = new_shipment.inventory_units
         expect(new_inventory_units.count).to eq 1
-        expect(new_inventory_units.first.line_item).to eq return_item.inventory_unit.line_item
         expect(new_inventory_units.first.original_return_item).to eq return_item
+        expect(new_inventory_units.first.line_item).to eq return_item.inventory_unit.line_item
       end
 
       context "when it cannot create shipments for all items" do
