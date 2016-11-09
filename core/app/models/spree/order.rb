@@ -487,8 +487,17 @@ module Spree
       # Inventory Units which are not associated to any shipment (unshippable)
       # and are not returned or shipped should be deleted
       inventory_units.on_hand_or_backordered.delete_all
-
       self.shipments = Spree::Stock::Coordinator.new(self).shipments
+    end
+
+    def create_proposed_shipments_for_delivery
+      all_adjustments.shipping.delete_all
+      shipments.destroy_all
+
+      # Inventory Units which are not associated to any shipment (unshippable)
+      # and are not returned or shipped should be deleted
+      inventory_units.on_hand_or_backordered.delete_all
+      self.shipments = Spree::Stock::ProposalCoordinator.new(self).shipments
     end
 
     def apply_free_shipping_promotions

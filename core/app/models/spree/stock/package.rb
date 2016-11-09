@@ -2,12 +2,14 @@ module Spree
   module Stock
     class Package
       attr_reader :stock_location, :contents
+      attr_writer :proposed
       attr_accessor :shipping_rates
 
       def initialize(stock_location, contents=[])
         @stock_location = stock_location
         @contents = contents
         @shipping_rates = Array.new
+        @proposed = false
       end
 
       def add(inventory_unit, state = :on_hand)
@@ -15,8 +17,19 @@ module Spree
         contents << ContentItem.new(inventory_unit, state)
       end
 
+      def as_proposed
+        @proposed = true
+        self
+      end
+
       def add_multiple(inventory_units, state = :on_hand)
         inventory_units.each { |inventory_unit| add(inventory_unit, state) }
+      end
+
+      def add_multiple_for_proposal(inventory_unit, count, state)
+        content_item = ContentItem.new(inventory_unit, state)
+        content_item.quantity = count
+        contents << content_item
       end
 
       def remove(inventory_unit)
@@ -81,13 +94,11 @@ module Spree
         # At this point we should only have one content item per inventory unit
         # across the entire set of inventory units to be shipped, which has been
         # taken care of by the Prioritizer
-        contents.each { |content_item| content_item.inventory_unit.state = content_item.state.to_s }
-
-        Spree::Shipment.new(
-          stock_location: stock_location,
-          shipping_rates: shipping_rates,
-          inventory_units: contents.map(&:inventory_unit)
-        )
+        shipment = Spree::Shipment.new(stock_location: stock_location, shipping_rates: shipping_rates)
+        unless proposed?
+          shipment.inventory_units = contents.collect(&:inventory_unit_with_state)
+        end
+        shipment
       end
 
       def contents_by_weight
@@ -100,6 +111,10 @@ module Spree
 
       def dimension
         contents.sum(&:dimension)
+      end
+
+      def proposed?
+        @proposed
       end
 
       private

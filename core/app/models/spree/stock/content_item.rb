@@ -6,10 +6,8 @@ module Spree
       def initialize(inventory_unit, state = :on_hand)
         @inventory_unit = inventory_unit
         @state = state
-        # Since inventory units don't have a quantity,
-        # make this always 1 for now, leaving ourselves
-        # open to a different possibility in the future,
-        # but this massively simplifies things for now
+        # Quantity will be > 1, if proposed to ease db pressure while building shipments
+        # after order is completed it will be used by a delayed job to build the actual inventory units
         @quantity = 1
       end
 
@@ -46,6 +44,11 @@ module Spree
 
       def dimension
         variant_dimension * quantity
+      end
+
+      def inventory_unit_with_state
+        inventory_unit.state = state.to_s
+        inventory_unit
       end
     end
   end
