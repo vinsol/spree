@@ -1,19 +1,26 @@
 module Spree
   module Stock
     class ContentItem
-      attr_accessor :inventory_unit, :state
+      attr_accessor :inventory_unit, :state, :quantity
 
       def initialize(inventory_unit, state = :on_hand)
         @inventory_unit = inventory_unit
         @state = state
+        # Since inventory units don't have a quantity,
+        # make this always 1 for now, leaving ourselves
+        # open to a different possibility in the future,
+        # but this massively simplifies things for now
+        @quantity = 1
       end
 
       with_options allow_nil: true do
         delegate :line_item,
                  :variant, to: :inventory_unit
-        delegate :price, to: :variant
+        delegate :price,
+                 :shipping_category_id, to: :variant
         delegate :dimension,
                  :volume,
+                 :id,
                  :weight, to: :variant, prefix: true
       end
 
@@ -29,17 +36,8 @@ module Spree
         state.to_s == "backordered"
       end
 
-
       def amount
         price * quantity
-      end
-
-      def quantity
-        # Since inventory units don't have a quantity,
-        # make this always 1 for now, leaving ourselves
-        # open to a different possibility in the future,
-        # but this massively simplifies things for now
-        1
       end
 
       def volume

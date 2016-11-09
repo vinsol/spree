@@ -105,7 +105,7 @@ module Spree
       private
 
       def variant_ids
-        contents.map { |item| item.inventory_unit.variant_id }.compact.uniq
+        contents.map { |item| item.variant_id }.compact.uniq
       end
     end
   end
