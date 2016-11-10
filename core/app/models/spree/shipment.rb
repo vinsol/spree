@@ -150,6 +150,7 @@ module Spree
           content.quantity.times { InventoryUnit.create(state: content.state, variant: content.variant, order_id: order_id, line_item: content.line_item, shipment: self) }
         end
       end
+      inventory_units.reload # They are created seperately load them since they won't be in memory
     end
 
     def include?(variant)

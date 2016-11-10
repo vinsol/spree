@@ -379,15 +379,13 @@ module Spree
     end
 
     def finalize_shipments!
-      transaction do
-        shipments.each do |shipment|
-          shipment.update!(self)
-          shipment.finalize!
-        end
-
-        updater.update_shipment_state
-        release_processing_shipments_lock
+      shipments.each do |shipment|
+        shipment.update!(self)
+        shipment.finalize!
       end
+
+      updater.update_shipment_state
+      release_processing_shipments_lock
     end
 
     def acquire_processing_shipments_lock
@@ -513,10 +511,6 @@ module Spree
       # and are not returned or shipped should be deleted
       inventory_units.on_hand_or_backordered.delete_all
       self.shipments = Spree::Stock::ProposalCoordinator.new(self).shipments
-    end
-
-    def create_final_shipments
-      self.shipments = Spree::Stock::Coordinator.new(self).shipments
     end
 
     def apply_free_shipping_promotions
