@@ -139,8 +139,15 @@ module Spree
     end
 
     def finalize!
+      create_inventory_units
       inventory_units.finalize_units!
       after_resume
+    end
+
+    def create_inventory_units
+      to_package.contents.each do |content|
+        content.quantity.times { self.inventory_units.new(state: content.state, variant: content.variant, order_id: order_id, line_item: content.line_item).save }
+      end
     end
 
     def include?(variant)

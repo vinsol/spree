@@ -361,18 +361,12 @@ module Spree
 
     # Finalizes an in progress order after checkout is complete.
     # Called after transition to complete state when payments will have been processed
-    def finalize!
+     def finalize!
       # lock all adjustments (coupon promotions, etc.)
       all_adjustments.each{|a| a.close}
 
       # update payment and shipment(s) states, and save
       updater.update_payment_state
-      shipments.each do |shipment|
-        shipment.update!(self)
-        shipment.finalize!
-      end
-
-      updater.update_shipment_state
       save!
       updater.run_hooks
 
@@ -381,7 +375,16 @@ module Spree
       deliver_order_confirmation_email unless confirmation_delivered?
 
       consider_risk
-    end
+     end
+
+     def finalize_shipments!
+       shipments.each do |shipment|
+        shipment.update!(self)
+        shipment.finalize!
+      end
+
+      updater.update_shipment_state
+     end
 
     def fulfill!
       shipments.each { |shipment| shipment.update!(self) if shipment.persisted? }
@@ -498,6 +501,10 @@ module Spree
       # and are not returned or shipped should be deleted
       inventory_units.on_hand_or_backordered.delete_all
       self.shipments = Spree::Stock::ProposalCoordinator.new(self).shipments
+    end
+
+    def create_final_shipments
+      self.shipments = Spree::Stock::Coordinator.new(self).shipments
     end
 
     def apply_free_shipping_promotions
