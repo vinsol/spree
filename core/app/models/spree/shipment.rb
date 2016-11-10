@@ -145,8 +145,10 @@ module Spree
     end
 
     def create_inventory_units
-      to_package.contents.each do |content|
-        content.quantity.times { self.inventory_units.new(state: content.state, variant: content.variant, order_id: order_id, line_item: content.line_item).save }
+      transaction do
+        to_package.contents.each do |content|
+          content.quantity.times { InventoryUnit.create(state: content.state, variant: content.variant, order_id: order_id, line_item: content.line_item, shipment: self) }
+        end
       end
     end
 
