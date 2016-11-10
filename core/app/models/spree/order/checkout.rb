@@ -112,6 +112,7 @@ module Spree
 
               after_transition to: :complete do |order|
                 order.finalize!
+                order.acquire_processing_shipments_lock
                 FinalizeOrderJob.perform_later order.id
               end
               after_transition to: :resumed, do: :after_resume

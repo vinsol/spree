@@ -152,6 +152,7 @@ module Spree
     scope :completed_between, ->(start_date, end_date) { where(completed_at: start_date..end_date) }
     scope :complete, -> { where.not(completed_at: nil) }
     scope :incomplete, -> { where(completed_at: nil) }
+    scope :editable,   -> { where(processing_shipments: false) }
 
     # shows completed orders first, by their completed_at date, then uncompleted orders by their created_at
     scope :reverse_chronological, -> { order('spree_orders.completed_at IS NULL', completed_at: :desc, created_at: :desc) }
@@ -378,12 +379,23 @@ module Spree
     end
 
     def finalize_shipments!
-      shipments.each do |shipment|
-        shipment.update!(self)
-        shipment.finalize!
-      end
+      transaction do
+        shipments.each do |shipment|
+          shipment.update!(self)
+          shipment.finalize!
+        end
 
-      updater.update_shipment_state
+        updater.update_shipment_state
+        release_processing_shipments_lock
+      end
+    end
+
+    def acquire_processing_shipments_lock
+      update_column(:processing_shipments, true)
+    end
+
+    def release_processing_shipments_lock
+      update_column(:processing_shipments, false)
     end
 
     def fulfill!
