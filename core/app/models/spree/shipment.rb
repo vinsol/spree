@@ -280,7 +280,16 @@ module Spree
     end
 
     def to_package
-      Stock::ProposalPacker.new(stock_location, Stock::ProposalInventoryUnitBuilder.new(order).units).packages.first
+      if inventory_units.none?
+        # Send the proposal package back
+        Stock::ProposalPacker.new(stock_location, Stock::ProposalInventoryUnitBuilder.new(order).units).packages.first
+      else
+        package = Stock::Package.new(stock_location)
+        inventory_units.includes(:variant).joins(:variant).group_by(&:state).each do |state, state_inventory_units|
+          package.add_multiple state_inventory_units, state.to_sym
+        end
+        package
+      end
     end
 
     def tracking_url
