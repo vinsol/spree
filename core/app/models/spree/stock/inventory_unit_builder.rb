@@ -11,8 +11,7 @@ module Spree
             @order.inventory_units.build(
               pending: true,
               variant_id: line_item.variant_id,
-              line_item: line_item,
-              order: @order
+              line_item: line_item
             )
           end
         end

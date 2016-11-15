@@ -379,6 +379,7 @@ module Spree
     end
 
     def finalize_shipments!
+      allot_inventory_units_to_shipment_proposal
       shipments.each do |shipment|
         shipment.update!(self)
         shipment.finalize!
@@ -491,6 +492,16 @@ module Spree
 
     def shipped?
       %w(partial shipped).include?(shipment_state)
+    end
+
+    def allot_inventory_units_to_shipment_proposal
+      existing_shipments = shipments
+      shipment_with_inventory_units = Spree::Stock::Coordinator.new(self).shipments
+      shipments.each do |_shipment|
+        matching_shipment = shipment_with_inventory_units.detect { |x| x.stock_location == _shipment.stock_location }
+        _shipment.inventory_units = matching_shipment.inventory_units
+        shipment_with_inventory_units -= [matching_shipment]
+      end
     end
 
     def create_proposed_shipments
