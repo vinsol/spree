@@ -10,7 +10,7 @@ module Spree
           if variant.should_track_inventory?
             next unless stock_location.stock_item(variant)
             on_hand_count, backordered_count = stock_location.fill_status(variant, variant_inventory_units.size)
-            package.add_multiple_for_proposal(variant_inventory_units, on_hand_count, :on_hand)       if on_hand_count > 0
+            package.add_multiple_for_proposal(variant_inventory_units, on_hand_count, :on_hand)         if on_hand_count > 0
             package.add_multiple_for_proposal(variant_inventory_units, backordered_count, :backordered) if backordered_count > 0
             inventory_units.mark_variant_as_allocated(variant)
           else

@@ -14,8 +14,12 @@ module Spree
       with_options allow_nil: true do
         delegate :line_item,
                  :variant, to: :inventory_unit
+
         delegate :price,
                  :shipping_category_id, to: :variant
+
+        delegate :order, to: :line_item
+
         delegate :dimension,
                  :volume,
                  :id,
@@ -24,6 +28,14 @@ module Spree
 
       def weight
         variant_weight * quantity
+      end
+
+      def remove_quantity(quantity_to_remove = 1)
+        self.quantity = quantity - quantity_to_remove
+      end
+
+      def empty?
+        quantity == 0
       end
 
       def on_hand?
@@ -49,6 +61,10 @@ module Spree
       def inventory_unit_with_state
         inventory_unit.state = state.to_s
         inventory_unit
+      end
+
+      def contains_inventory_unit?(inventory_unit, state = nil)
+        (inventory_unit.variant == self.variant) && (state.nil? || state.to_s == self.state.to_s)
       end
     end
   end

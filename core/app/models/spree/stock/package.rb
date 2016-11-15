@@ -32,15 +32,19 @@ module Spree
         contents << content_item
       end
 
-      def remove(inventory_unit)
+      def remove(inventory_unit, quantity=1)
         item = find_item(inventory_unit)
-        @contents -= [item] if item
+        if item
+          item.remove_quantity(quantity)
+          @contents -= [item] if item.empty?
+        end
       end
 
       # Fix regression that removed package.order.
       # Find it dynamically through an inventory_unit.
       def order
-        contents.detect {|item| !!item.try(:inventory_unit).try(:order) }.try(:inventory_unit).try(:order)
+        @_item_with_order ||= contents.detect {|item| item.try(:order).present? }
+        @_item_with_order.order if @_item_with_order
       end
 
       def weight
@@ -57,8 +61,7 @@ module Spree
 
       def find_item(inventory_unit, state = nil)
         contents.detect do |item|
-          item.inventory_unit == inventory_unit &&
-            (!state || item.state.to_s == state.to_s)
+          item.contains_inventory_unit?(inventory_unit, state)
         end
       end
 
