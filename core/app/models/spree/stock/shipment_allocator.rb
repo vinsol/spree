@@ -12,7 +12,7 @@ module Spree
       def allocate_proposal_content
         shipments.each do |_shipment|
           match = next_proposed_match(_shipment)
-          _shipment.package_contents = match.contents
+          _shipment.proposed_package_contents = match.contents
         end
       end
 

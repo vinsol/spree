@@ -30,7 +30,7 @@ module Spree
     validates :stock_location, presence: true
 
     attr_accessor :special_instructions
-    attr_accessor :package_contents
+    attr_accessor :proposed_package_contents
 
     accepts_nested_attributes_for :address
     accepts_nested_attributes_for :inventory_units
@@ -101,6 +101,10 @@ module Spree
       manifest.each { |item| manifest_unstock(item) }
     end
 
+    def pre_finalize
+      manifest.each { |item| manifest_unstock(item) }
+    end
+
     def backordered?
       inventory_units.any? { |inventory_unit| inventory_unit.backordered? }
     end
@@ -141,7 +145,6 @@ module Spree
 
     def finalize!
       inventory_units.finalize_units!
-      after_resume
     end
 
     def include?(variant)
@@ -167,7 +170,7 @@ module Spree
     ManifestItem = Struct.new(:line_item, :variant, :quantity, :states)
 
     def manifest
-      return manifest_from_package_contents if inventory_units.none? && package_contents.present?
+      return manifest_from_proposed_package_contents if inventory_units.none? && proposed_package_contents.present?
 
       # Grouping by the ID means that we don't have to call out to the association accessor
       # This makes the grouping by faster because it results in less SQL cache hits.
@@ -184,8 +187,8 @@ module Spree
       end.flatten
     end
 
-    def manifest_from_package_contents
-      package_contents.group_by(&:variant_id).map do |variant_id, contents|
+    def manifest_from_proposed_package_contents
+      proposed_package_contents.group_by(&:variant_id).map do |variant_id, contents|
         contents.group_by(&:line_item_id).map do |line_item_id, units|
           states = {}
           units.group_by(&:state).each { |state, unit| states[state] = unit.sum(&:quantity) }
@@ -286,9 +289,9 @@ module Spree
     end
 
     def to_package
-      if inventory_units.none? && package_contents.present?
-        # Send the proposal package back
-        Stock::Package.new(stock_location, package_contents)
+      if inventory_units.none? && proposed_package_contents.present?
+        # Return package with proposed contents
+        Stock::Package.new(stock_location, proposed_package_contents).as_proposed
       else
         package = Stock::Package.new(stock_location)
         inventory_units.includes(:variant).joins(:variant).group_by(&:state).each do |state, state_inventory_units|

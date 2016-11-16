@@ -374,6 +374,8 @@ module Spree
       touch :completed_at
 
       deliver_order_confirmation_email unless confirmation_delivered?
+      allot_content_items_to_shipment_proposal
+      shipments.each(&:pre_finalize)
 
       consider_risk
     end
