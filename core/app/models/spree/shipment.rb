@@ -101,10 +101,6 @@ module Spree
       manifest.each { |item| manifest_unstock(item) }
     end
 
-    def pre_finalize
-      manifest.each { |item| manifest_unstock(item) }
-    end
-
     def backordered?
       inventory_units.any? { |inventory_unit| inventory_unit.backordered? }
     end
@@ -145,6 +141,7 @@ module Spree
 
     def finalize!
       inventory_units.finalize_units!
+      after_resume
     end
 
     def include?(variant)
