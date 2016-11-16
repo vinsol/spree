@@ -19,6 +19,7 @@ module Spree
                  :shipping_category_id, to: :variant
 
         delegate :order, to: :line_item
+        delegate :id, to: :line_item, prefix: true
 
         delegate :dimension,
                  :volume,

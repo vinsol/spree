@@ -495,13 +495,11 @@ module Spree
     end
 
     def allot_inventory_units_to_shipment_proposal
-      existing_shipments = shipments
-      shipment_with_inventory_units = Spree::Stock::Coordinator.new(self).shipments
-      shipments.each do |_shipment|
-        matching_shipment = shipment_with_inventory_units.detect { |x| x.stock_location == _shipment.stock_location }
-        _shipment.inventory_units = matching_shipment.inventory_units
-        shipment_with_inventory_units -= [matching_shipment]
-      end
+      Stock::ShipmentAllocator.new(self).allocate_inventory_units
+    end
+
+    def allot_content_items_to_shipment_proposal
+      Stock::ShipmentAllocator.new(self).allocate_proposal_content
     end
 
     def create_proposed_shipments

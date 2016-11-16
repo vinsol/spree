@@ -8,7 +8,11 @@ module Spree
       end
 
       def packages
-        super.collect(&:as_proposed)
+        estimate_packages(build_packages).collect(&:as_proposed)
+      end
+
+      def proposed_shipments
+        packages.collect(&:to_proposed_shipment)
       end
 
       private

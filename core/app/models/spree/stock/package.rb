@@ -104,6 +104,10 @@ module Spree
         shipment
       end
 
+      def to_proposed_shipment
+        ProposedShipment.new(stock_location, contents)
+      end
+
       def contents_by_weight
         contents.sort { |x, y| y.weight <=> x.weight }
       end
