@@ -3,19 +3,21 @@ require 'spec_helper'
 describe "Stock Locations", type: :feature do
   stub_authorization!
 
+  let!(:country) { create(:country) }
+  let!(:state) { create(:state, country: country) }
+
   before(:each) do
-    country = create(:country)
     visit spree.admin_stock_locations_path
   end
 
   it "can create a new stock location" do
     click_link "New Stock Location"
     fill_in "Name", with: "London"
-    check "Active"
+    targetted_select2_search state.name, from: "#s2id_stock_location_state_id"
     click_button "Create"
 
-    expect(page).to have_content("successfully created")
-    expect(page).to have_content("London")
+    expect(Spree::StockLocation.last.state.name).to eq(state.name)
+    expect(Spree::StockLocation.last.name).to eq("London")
   end
 
   it "can delete an existing stock location", js: true do
