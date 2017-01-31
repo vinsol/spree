@@ -55,16 +55,6 @@ Spree::Core::Engine.add_routes do
 
     delete '/product_properties/:id', to: "product_properties#destroy", as: :product_property
 
-    resources :prototypes do
-      member do
-        get :select
-      end
-
-      collection do
-        get :available
-      end
-    end
-
     resources :orders, except: [:show] do
       member do
         get :cart

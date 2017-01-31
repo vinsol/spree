@@ -59,10 +59,6 @@ describe "Homepage", type: :feature do
       it "has a link to properties" do
         within('.sidebar') { page.find_link("Properties")['/admin/properties'] }
       end
-
-      it "has a link to prototypes" do
-        within('.sidebar') { page.find_link("Prototypes")['/admin/prototypes'] }
-      end
     end
   end
 

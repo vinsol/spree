@@ -110,84 +110,6 @@ describe "Products", type: :feature do
       end
     end
 
-    context "creating a new product from a prototype", js: true do
-      def build_option_type_with_values(name, values)
-        ot = FactoryGirl.create(:option_type, name: name)
-        values.each do |val|
-          ot.option_values.create(name: val.downcase, presentation: val)
-        end
-        ot
-      end
-
-      let(:product_attributes) do
-        # FactoryGirl.attributes_for is un-deprecated!
-        #   https://github.com/thoughtbot/factory_girl/issues/274#issuecomment-3592054
-        FactoryGirl.attributes_for(:simple_product)
-      end
-
-      let(:prototype) do
-        size = build_option_type_with_values("size", %w(Small Medium Large))
-        FactoryGirl.create(:prototype, name: "Size", option_types: [ size ])
-      end
-
-      let(:option_values_hash) do
-        hash = {}
-        prototype.option_types.each do |i|
-          hash[i.id.to_s] = i.option_value_ids
-        end
-        hash
-      end
-
-      before(:each) do
-        @option_type_prototype = prototype
-        @property_prototype = create(:prototype, name: "Random")
-        @shipping_category = create(:shipping_category)
-        visit spree.admin_products_path
-        click_link "admin_new_product"
-        within('#new_product') do
-          expect(page).to have_content("SKU")
-        end
-      end
-
-      it "should allow an admin to create a new product and variants from a prototype" do
-        fill_in "product_name", with: "Baseball Cap"
-        fill_in "product_sku", with: "B100"
-        fill_in "product_price", with: "100"
-        fill_in "product_available_on", with: "2012/01/24"
-        # Just so the datepicker gets out of poltergeists way.
-        page.execute_script("$('#ui-datepicker-div').hide();")
-        select "Size", from: "Prototype"
-        wait_for_ajax
-        check "Large"
-        select @shipping_category.name, from: "product_shipping_category_id"
-        click_button "Create"
-        expect(page).to have_content("successfully created!")
-        expect(Spree::Product.last.variants.length).to eq(1)
-      end
-
-      it "should not display variants when prototype does not contain option types" do
-        select "Random", from: "Prototype"
-
-        fill_in "product_name", with: "Baseball Cap"
-
-        expect(page).not_to have_content("Variants")
-      end
-
-      it "should keep option values selected if validation fails" do
-        fill_in "product_name", with: "Baseball Cap"
-        fill_in "product_sku", with: "B100"
-        fill_in "product_price", with: "100"
-        select "Size", from: "Prototype"
-        wait_for_ajax
-        check "Large"
-        click_button "Create"
-        expect(page).to have_content("Shipping Category can't be blank")
-        expect(field_labeled("Size")).to be_checked
-        expect(field_labeled("Large")).to be_checked
-        expect(field_labeled("Small")).not_to be_checked
-      end
-    end
-
     context "creating a new product" do
       before(:each) do
         @shipping_category = create(:shipping_category)
@@ -300,39 +222,12 @@ describe "Products", type: :feature do
     context 'updating a product' do
       let(:product) { create(:product) }
 
-      let(:prototype) do
-        size = build_option_type_with_values("size", %w(Small Medium Large))
-        FactoryGirl.create(:prototype, name: "Size", option_types: [ size ])
-      end
-
-      before(:each) do
-        @option_type_prototype = prototype
-        @property_prototype = create(:prototype, name: "Random")
-      end
-
       it 'should parse correctly available_on' do
         visit spree.admin_product_path(product)
         fill_in "product_available_on", with: "2012/12/25"
         click_button "Update"
         expect(page).to have_content("successfully updated!")
         expect(Spree::Product.last.available_on.to_s).to eq("2012-12-25 00:00:00 UTC")
-      end
-
-      it 'should add option_types when selecting a prototype', js: true do
-        visit spree.admin_product_path(product)
-        within('#sidebar') do
-          click_link 'Properties'
-        end
-        click_link "Select From Prototype"
-
-        within("#prototypes tr#row_#{prototype.id}") do
-          click_link 'Select'
-          wait_for_ajax
-        end
-
-        within(:css, "tr.product_property:first-child") do
-          expect(first('input[type=text]').value).to eq('baseball_cap_color')
-        end
       end
 
       context "using a locale with a different decimal format" do
