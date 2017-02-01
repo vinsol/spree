@@ -13,12 +13,14 @@ module Spree
         def inventory_unit1
           InventoryUnit.new(variant: variant1).tap do |inventory_unit|
             inventory_unit.variant.product.shipping_category = shipping_category_1
+            inventory_unit.variant.product.save!
           end
         end
 
         def inventory_unit2
           InventoryUnit.new(variant: variant2).tap do |inventory_unit|
             inventory_unit.variant.product.shipping_category = shipping_category_2
+            inventory_unit.variant.product.save!
           end
         end
 
@@ -36,6 +38,7 @@ module Spree
           9.times { package2.add inventory_unit2, :backordered }
 
           packages = subject.split([package1, package2])
+
           expect(packages[0].quantity).to eq 4
           expect(packages[1].quantity).to eq 8
           expect(packages[2].quantity).to eq 6

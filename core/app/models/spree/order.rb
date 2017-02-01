@@ -404,7 +404,7 @@ module Spree
     end
 
     def insufficient_stock_lines
-      line_items.select(&:insufficient_stock?)
+      line_items.includes(variant: :product).select(&:insufficient_stock?)
     end
 
     ##
@@ -492,8 +492,14 @@ module Spree
       # Inventory Units which are not associated to any shipment (unshippable)
       # and are not returned or shipped should be deleted
       inventory_units.on_hand_or_backordered.delete_all
-
-      self.shipments = Spree::Stock::Coordinator.new(self).shipments
+      shipments_proposed = Spree::Stock::Coordinator.new(self).shipments
+      shipments_proposed.each do |_shipment|
+        self.shipments << _shipment[:shipment]
+        _shipment[:shipment].process_inventory_unit_list(_shipment[:inventory_units])
+        _shipment[:shipment].inventory_units.reload
+      end
+      self.inventory_units.reload
+      self.shipments
     end
 
     def apply_free_shipping_promotions

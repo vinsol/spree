@@ -88,20 +88,20 @@ module Spree
         shipping_method = build(:shipping_method)
         subject.shipping_rates = [ Spree::ShippingRate.new(shipping_method: shipping_method, cost: 10.00, selected: true) ]
 
-        shipment = subject.to_shipment
-        expect(shipment.stock_location).to eq subject.stock_location
-        expect(shipment.inventory_units.size).to eq 3
+        shipment = subject.to_shipment(mock_model(Address))
+        expect(shipment[:shipment].stock_location).to eq subject.stock_location
+        expect(shipment[:inventory_units].size).to eq 3
 
-        first_unit = shipment.inventory_units.first
+        first_unit = shipment[:inventory_units].first
         expect(first_unit.variant).to eq variant
         expect(first_unit.state).to eq 'on_hand'
         expect(first_unit).to be_pending
 
-        last_unit = shipment.inventory_units.last
+        last_unit = shipment[:inventory_units].last
         expect(last_unit.variant).to eq variant
         expect(last_unit.state).to eq 'backordered'
 
-        expect(shipment.shipping_method).to eq shipping_method
+        expect(shipment[:shipment].shipping_method).to eq shipping_method
       end
 
       describe "#add_multiple" do

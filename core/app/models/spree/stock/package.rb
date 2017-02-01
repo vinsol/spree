@@ -68,7 +68,7 @@ module Spree
       end
 
       def shipping_methods
-        shipping_categories.includes(:shipping_methods).map(&:shipping_methods).reduce(:&).to_a
+        shipping_categories.includes(shipping_methods: :calculator).map(&:shipping_methods).reduce(:&).to_a
       end
 
       def inspect
@@ -77,17 +77,23 @@ module Spree
         end.join(' / ')
       end
 
-      def to_shipment
+      def to_shipment(ship_address)
         # At this point we should only have one content item per inventory unit
         # across the entire set of inventory units to be shipped, which has been
         # taken care of by the Prioritizer
-        contents.each { |content_item| content_item.inventory_unit.state = content_item.state.to_s }
+        inventory_units = contents.map do |content|
+          iu       = content.inventory_unit
+          iu.state = content.state.to_s
+          iu
+        end
+        # contents.each { |content_item| content_item.inventory_unit.state = content_item.state.to_s }
 
-        Spree::Shipment.new(
+        shipment = Spree::Shipment.new(
           stock_location: stock_location,
           shipping_rates: shipping_rates,
-          inventory_units: contents.map(&:inventory_unit)
+          address: ship_address
         )
+        { shipment: shipment, inventory_units: inventory_units }
       end
 
       def contents_by_weight

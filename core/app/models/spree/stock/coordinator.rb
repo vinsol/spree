@@ -10,8 +10,9 @@ module Spree
       end
 
       def shipments
+        addr  = order.ship_address
         packages.map do |package|
-          package.to_shipment.tap { |s| s.address = order.ship_address }
+          package.to_shipment(addr)
         end
       end
 
@@ -24,17 +25,17 @@ module Spree
       def build_packages(packages = Array.new)
         stock_locations_with_requested_variants.each do |stock_location|
           packer = build_packer(stock_location, unallocated_inventory_units)
-          packages += packer.packages
-          @allocated_inventory_units += packer.allocated_inventory_units
+          # += allocates a new array per loop, avoid it
+          packages.push(*packer.packages)
+          @allocated_inventory_units.push(*packer.allocated_inventory_units)
         end
-
         packages
       end
 
       private
 
       def unallocated_inventory_units
-        inventory_units - allocated_inventory_units
+        @inventory_units - @allocated_inventory_units
       end
 
       def stock_locations_with_requested_variants

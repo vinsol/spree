@@ -24,12 +24,12 @@ module Spree
         it "turns packages into shipments" do
           shipments = subject.shipments
           expect(shipments.count).to eq packages.count
-          shipments.each { |shipment| expect(shipment).to be_a Shipment }
+          shipments.each { |shipment| expect(shipment[:shipment]).to be_a Shipment }
         end
 
         it "puts the order's ship address on the shipments" do
           shipments = subject.shipments
-          shipments.each { |shipment| expect(shipment.address).to eq order.ship_address }
+          shipments.each { |shipment| expect(shipment[:shipment].address).to eq order.ship_address }
         end
       end
 
