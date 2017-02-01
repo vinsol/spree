@@ -29,7 +29,7 @@ module Spree
 
         def shipping_category_for(item)
           @item_shipping_category ||= {}
-          @item_shipping_category[item.inventory_unit.variant_id] ||= item.variant.shipping_category_id
+          @item_shipping_category[item.variant_id] ||= item.shipping_category_id
         end
       end
     end

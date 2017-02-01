@@ -48,7 +48,7 @@ module Spree
         end
 
         def load_order
-          @order = Order.includes(:adjustments).friendly.find(params[:order_id])
+          @order = Order.editable.includes(:adjustments).friendly.find(params[:order_id])
         end
 
         def model_class

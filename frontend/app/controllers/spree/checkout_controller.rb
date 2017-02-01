@@ -145,12 +145,14 @@ module Spree
     def before_delivery
       return if params[:order].present?
 
+      @order.allot_content_items_to_shipment_proposal
       packages = @order.shipments.map(&:to_package)
       @differentiator = Spree::Stock::Differentiator.new(@order, packages)
     end
 
     def before_payment
       if @order.checkout_steps.include? "delivery"
+        @order.allot_content_items_to_shipment_proposal
         packages = @order.shipments.map(&:to_package)
         @differentiator = Spree::Stock::Differentiator.new(@order, packages)
         @differentiator.missing.each do |variant, quantity|

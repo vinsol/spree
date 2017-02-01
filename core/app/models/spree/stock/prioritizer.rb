@@ -27,7 +27,7 @@ module Spree
               adjuster = build_adjuster(item, package)
             elsif item.state == :on_hand && adjuster.status == :backordered
               # Remove item from backordered package
-              adjuster.package.remove(item.inventory_unit)
+              adjuster.package.remove(item.inventory_unit, item.quantity)
               # Reassign adjuster's status package
               adjuster.reassign(:on_hand, package)
             end

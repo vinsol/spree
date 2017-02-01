@@ -152,6 +152,7 @@ module Spree
     scope :completed_between, ->(start_date, end_date) { where(completed_at: start_date..end_date) }
     scope :complete, -> { where.not(completed_at: nil) }
     scope :incomplete, -> { where(completed_at: nil) }
+    scope :editable,   -> { where(processing_shipments: false) }
 
     # shows completed orders first, by their completed_at date, then uncompleted orders by their created_at
     scope :reverse_chronological, -> { order('spree_orders.completed_at IS NULL', completed_at: :desc, created_at: :desc) }
@@ -367,12 +368,6 @@ module Spree
 
       # update payment and shipment(s) states, and save
       updater.update_payment_state
-      shipments.each do |shipment|
-        shipment.update!(self)
-        shipment.finalize!
-      end
-
-      updater.update_shipment_state
       save!
       updater.run_hooks
 
@@ -381,6 +376,25 @@ module Spree
       deliver_order_confirmation_email unless confirmation_delivered?
 
       consider_risk
+    end
+
+    def finalize_shipments!
+      allot_inventory_units_to_shipment_proposal
+      shipments.each do |shipment|
+        shipment.update!(self)
+        shipment.finalize!
+      end
+
+      updater.update_shipment_state
+      release_processing_shipments_lock
+    end
+
+    def acquire_processing_shipments_lock
+      update_column(:processing_shipments, true)
+    end
+
+    def release_processing_shipments_lock
+      update_column(:processing_shipments, false)
     end
 
     def fulfill!
@@ -480,6 +494,14 @@ module Spree
       %w(partial shipped).include?(shipment_state)
     end
 
+    def allot_inventory_units_to_shipment_proposal
+      Stock::ShipmentAllocator.new(self).allocate_inventory_units
+    end
+
+    def allot_content_items_to_shipment_proposal
+      Stock::ShipmentAllocator.new(self).allocate_proposal_content
+    end
+
     def create_proposed_shipments
       all_adjustments.shipping.delete_all
 
@@ -492,8 +514,17 @@ module Spree
       # Inventory Units which are not associated to any shipment (unshippable)
       # and are not returned or shipped should be deleted
       inventory_units.on_hand_or_backordered.delete_all
-
       self.shipments = Spree::Stock::Coordinator.new(self).shipments
+    end
+
+    def create_proposed_shipments_for_delivery
+      all_adjustments.shipping.delete_all
+      shipments.destroy_all
+
+      # Inventory Units which are not associated to any shipment (unshippable)
+      # and are not returned or shipped should be deleted
+      inventory_units.on_hand_or_backordered.delete_all
+      self.shipments = Spree::Stock::ProposalCoordinator.new(self).shipments
     end
 
     def apply_free_shipping_promotions

@@ -30,6 +30,7 @@ module Spree
     validates :stock_location, presence: true
 
     attr_accessor :special_instructions
+    attr_accessor :proposed_package_contents
 
     accepts_nested_attributes_for :address
     accepts_nested_attributes_for :inventory_units
@@ -166,6 +167,8 @@ module Spree
     ManifestItem = Struct.new(:line_item, :variant, :quantity, :states)
 
     def manifest
+      return manifest_from_proposed_package_contents if inventory_units.none? && proposed_package_contents.present?
+
       # Grouping by the ID means that we don't have to call out to the association accessor
       # This makes the grouping by faster because it results in less SQL cache hits.
       inventory_units.group_by(&:variant_id).map do |variant_id, units|
@@ -177,6 +180,18 @@ module Spree
           line_item = units.first.line_item
           variant = units.first.variant
           ManifestItem.new(line_item, variant, units.length, states)
+        end
+      end.flatten
+    end
+
+    def manifest_from_proposed_package_contents
+      proposed_package_contents.group_by(&:variant_id).map do |variant_id, contents|
+        contents.group_by(&:line_item_id).map do |line_item_id, units|
+          states = {}
+          units.group_by(&:state).each { |state, unit| states[state] = unit.sum(&:quantity) }
+          line_item = units.first.line_item
+          variant   = units.first.variant
+          ManifestItem.new(line_item, variant, units.sum(&:quantity), states)
         end
       end.flatten
     end
@@ -271,11 +286,16 @@ module Spree
     end
 
     def to_package
-      package = Stock::Package.new(stock_location)
-      inventory_units.includes(:variant).joins(:variant).group_by(&:state).each do |state, state_inventory_units|
-        package.add_multiple state_inventory_units, state.to_sym
+      if inventory_units.none? && proposed_package_contents.present?
+        # Return package with proposed contents
+        Stock::Package.new(stock_location, proposed_package_contents).as_proposed
+      else
+        package = Stock::Package.new(stock_location)
+        inventory_units.includes(:variant).joins(:variant).group_by(&:state).each do |state, state_inventory_units|
+          package.add_multiple state_inventory_units, state.to_sym
+        end
+        package
       end
-      package
     end
 
     def tracking_url
