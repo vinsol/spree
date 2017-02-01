@@ -1,8 +1,5 @@
 class CreateSpreeTaxonsPrototypes < ActiveRecord::Migration[4.2]
   def change
-    create_table :spree_taxons_prototypes do |t|
-      t.belongs_to :taxon, index: true
-      t.belongs_to :prototype, index: true
-    end
+    # Prototype feature has been extracted out as an extension, spree_prototypes
   end
 end

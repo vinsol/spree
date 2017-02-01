@@ -412,62 +412,39 @@ describe Spree::Product, type: :model do
   end
 
   context '#create' do
-    let!(:prototype) { create(:prototype) }
+    let!(:property) { create(:property) }
+    let!(:option_type) { create(:option_type) }
     let!(:product) { Spree::Product.new(name: "Foo", price: 1.99, shipping_category_id: create(:shipping_category).id) }
 
-    before { product.prototype_id = prototype.id }
+    it "should assign properties" do
+      product.properties = [property]
+      product.save
 
-    context "when prototype is supplied" do
-      it "should create properties based on the prototype" do
-        product.save
-        expect(product.properties.count).to eq(1)
-      end
+      expect(product.properties.count).to eq(1)
+      expect(product.properties).to include(property)
     end
 
-    context "when prototype with option types is supplied" do
+    it "should assign option_type" do
+      product.option_types = [option_type]
+      product.save
+
+      expect(product.option_types.count).to eq(1)
+      expect(product.option_types).to include(option_type)
+    end
+
+    context "when option types are supplied" do
       def build_option_type_with_values(name, values)
         values.each_with_object(create :option_type, name: name) do |val, ot|
           ot.option_values.create(name: val.downcase, presentation: val)
         end
       end
 
-      let(:prototype) do
-        size = build_option_type_with_values("size", %w(Small Medium Large))
-        create(:prototype, name: "Size", option_types: [ size ])
-      end
-
-      let(:option_values_hash) do
-        hash = {}
-        prototype.option_types.each do |i|
-          hash[i.id.to_s] = i.option_value_ids
-        end
-        hash
-      end
-
-      it "should create option types based on the prototype" do
-        product.save
-        expect(product.option_type_ids.length).to eq(1)
-        expect(product.option_type_ids).to eq(prototype.option_type_ids)
-      end
-
-      it "should create product option types based on the prototype" do
-        product.save
-        expect(product.product_option_types.pluck(:option_type_id)).to eq(prototype.option_type_ids)
-      end
+      let(:option_type) { build_option_type_with_values("size", %w(Small Medium Large)) }
+      let(:option_values_hash) { { option_type.id.to_s => option_type.option_value_ids } }
 
       it "should create variants from an option values hash with one option type" do
         product.option_values_hash = option_values_hash
         product.save
-        expect(product.variants.length).to eq(3)
-      end
-
-      it "should still create variants when option_values_hash is given but prototype id is nil" do
-        product.option_values_hash = option_values_hash
-        product.prototype_id = nil
-        product.save
-        product.reload
-        expect(product.option_type_ids.length).to eq(1)
-        expect(product.option_type_ids).to eq(prototype.option_type_ids)
         expect(product.variants.length).to eq(3)
       end
 

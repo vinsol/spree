@@ -9,9 +9,6 @@ module Spree
 
     has_many :products, through: :product_option_types
 
-    has_many :option_type_prototypes, class_name: 'Spree::OptionTypePrototype'
-    has_many :prototypes, through: :option_type_prototypes, class_name: 'Spree::Prototype'
-
     with_options presence: true do
       validates :name, uniqueness: { allow_blank: true }
       validates :presentation

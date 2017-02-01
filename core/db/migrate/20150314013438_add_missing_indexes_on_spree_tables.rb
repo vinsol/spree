@@ -28,34 +28,6 @@ class AddMissingIndexesOnSpreeTables < ActiveRecord::Migration[4.2]
       add_index :spree_orders_promotions, [:promotion_id, :order_id]
     end
 
-    if data_source_exists?(:spree_properties_prototypes) && !index_exists?(:spree_properties_prototypes, :prototype_id)
-      add_index :spree_properties_prototypes, :prototype_id
-    end
-
-    if data_source_exists?(:spree_properties_prototypes) && !index_exists?(:spree_properties_prototypes,
-                                                                     [:prototype_id, :property_id],
-                                                                     name: 'index_properties_prototypes_on_prototype_and_property')
-      add_index :spree_properties_prototypes,
-                [:prototype_id, :property_id],
-                name: 'index_properties_prototypes_on_prototype_and_property'
-    end
-
-    if data_source_exists?(:spree_taxons_prototypes) && !index_exists?(:spree_taxons_prototypes, [:prototype_id, :taxon_id])
-      add_index :spree_taxons_prototypes, [:prototype_id, :taxon_id]
-    end
-
-    if data_source_exists?(:spree_option_types_prototypes) && !index_exists?(:spree_option_types_prototypes, :prototype_id)
-      add_index :spree_option_types_prototypes, :prototype_id
-    end
-
-    if data_source_exists?(:spree_option_types_prototypes) && !index_exists?(:spree_option_types_prototypes,
-                                                                       [:prototype_id, :option_type_id],
-                                                                       name: 'index_option_types_prototypes_on_prototype_and_option_type')
-      add_index :spree_option_types_prototypes,
-                [:prototype_id, :option_type_id],
-                name: 'index_option_types_prototypes_on_prototype_and_option_type'
-    end
-
     if data_source_exists?(:spree_option_values_variants) && !index_exists?(:spree_option_values_variants,
                                                                        [:option_value_id, :variant_id],
                                                                        name: 'index_option_values_variants_on_option_value_and_variant')

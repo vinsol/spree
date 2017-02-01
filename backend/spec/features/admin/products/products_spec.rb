@@ -316,7 +316,6 @@ describe "Products", type: :feature do
       expect(page).to have_link('Products')
       expect(page).not_to have_link('Option Types')
       expect(page).not_to have_link('Properties')
-      expect(page).not_to have_link('Prototypes')
       expect(page).not_to have_link('New Product')
       expect(page).not_to have_css('.icon-clone')
       expect(page).to have_css('.icon-edit')

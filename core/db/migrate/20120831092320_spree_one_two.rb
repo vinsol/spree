@@ -163,11 +163,6 @@ class SpreeOneTwo < ActiveRecord::Migration[4.2]
       t.timestamps null: false
     end
 
-    create_table :spree_option_types_prototypes, id: false do |t|
-      t.references :prototype
-      t.references :option_type
-    end
-
     create_table :spree_option_values do |t|
       t.integer    :position
       t.string     :name
@@ -284,16 +279,6 @@ class SpreeOneTwo < ActiveRecord::Migration[4.2]
     create_table :spree_properties do |t|
       t.string     :name
       t.string     :presentation, null: false
-      t.timestamps null: false
-    end
-
-    create_table :spree_properties_prototypes, id: false do |t|
-      t.references :prototype
-      t.references :property
-    end
-
-    create_table :spree_prototypes do |t|
-      t.string     :name
       t.timestamps null: false
     end
 

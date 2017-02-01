@@ -80,7 +80,6 @@ module Spree
 
     has_many :variant_images, -> { order(:position) }, source: :images, through: :variants_including_master
 
-    after_create :add_associations_from_prototype
     after_create :build_variants_from_option_values_hash, if: :option_values_hash
 
     after_destroy :punch_slug
@@ -125,12 +124,6 @@ module Spree
 
     def tax_category
       super || TaxCategory.find_by(is_default: true)
-    end
-
-    # Adding properties and option types on creation based on a chosen prototype
-    attr_reader :prototype_id
-    def prototype_id=(value)
-      @prototype_id = value.to_i
     end
 
     # Ensures option_types and product_option_types exist for keys in option_values_hash
@@ -246,16 +239,6 @@ module Spree
     end
 
     private
-
-    def add_associations_from_prototype
-      if prototype_id && prototype = Spree::Prototype.find_by(id: prototype_id)
-        prototype.properties.each do |property|
-          product_properties.create(property: property)
-        end
-        self.option_types = prototype.option_types
-        self.taxons = prototype.taxons
-      end
-    end
 
     def any_variants_not_track_inventory?
       return true unless Spree::Config.track_inventory_levels
