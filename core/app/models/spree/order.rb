@@ -275,7 +275,7 @@ module Spree
 
       # immediately persist the changes we just made, but don't use save
       # since we might have an invalid address associated
-      self.class.unscoped.where(id: self).update_all(changes)
+      update_columns(changes) if persisted?
     end
 
     def quantity_of(variant, options = {})
