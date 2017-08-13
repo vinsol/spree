@@ -12,6 +12,7 @@ module Spree
 
             create_params = params.slice :currency
             order = Spree::Order.create! create_params
+            order.update!(store: Spree::Store.default) unless order.store
             order.associate_user!(user)
 
             shipments_attrs = params.delete(:shipments_attributes)

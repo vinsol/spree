@@ -23,6 +23,19 @@ module Spree
       user
     end
 
+    shared_examples_for 'action in which order has default store assigned' do
+      it 'default store should be assigned' do
+        Spree::Store.create!(
+          name: "Jaspreet's store", code: 'jaspreet21anand',
+          url: 'vinsol.com', mail_from_address: 'jaspreet21anand@gmail.com',
+          default: true
+        )
+        expect { api_post :create }.not_to raise_error
+        order = Order.last
+        expect(order.store).to eq(Spree::Store.default)
+      end
+    end
+
     before do
       stub_authentication!
     end
@@ -248,6 +261,8 @@ module Spree
       expect(order.email).to eq(current_api_user.email)
       expect(json_response["user_id"]).to eq(current_api_user.id)
     end
+
+    it_should_behave_like 'action in which order has default store assigned'
 
     it "assigns email when creating a new order" do
       api_post :create, order: { email: "guest@spreecommerce.org" }
@@ -672,6 +687,8 @@ module Spree
           order = Order.last
           expect(json_response["state"]).to eq("cart")
         end
+
+        it_should_behave_like 'action in which order has default store assigned'
 
         it "can arbitrarily set the line items price" do
           api_post :create, order: {
